@@ -6,6 +6,7 @@ import sys
 
 from websocket import create_connection
 
+from engine.src.main.recorder.recorder import Recorder
 from model.src.main.book.book import Book
 from model.src.main.strategy.mbl import MBL
 from model.src.main.strategy.mbl_snapshot import MBLSnapshot
@@ -102,6 +103,7 @@ def btfxwss():
 
     mbl = MBL()
     book = Book()
+    recorder = Recorder(open("output.txt", mode='w'))
 
     # Accessing data stored in BtfxWss:
     books_queue = wss.books('ETHUSD')  # returns a Queue object for the pair.
@@ -114,13 +116,13 @@ def btfxwss():
             print("snapshot")
             mbl_snapshot = MBLSnapshot(book_update)
             book = mbl.from_snapshot(mbl_snapshot)
-            print(book)
+            recorder.on_mbl(book)
 
         elif len(book_update) == 3:
             print("update: " + str(book_update))
             update = MBLUpdate(book_update[0], book_update[1], book_update[2])
             book = mbl.update(book, update)
-            print(book)
+            recorder.on_mbl(book)
 
     # Unsubscribing from channels:
     wss.unsubscribe_from_ticker('BTCUSD')
