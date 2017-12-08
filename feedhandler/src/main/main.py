@@ -8,6 +8,8 @@ from websocket import create_connection
 
 from engine.src.main.recorder.recorder import Recorder
 from model.src.main.book.book import Book
+from model.src.main.trade.trades import Trades
+from model.src.main.trade.trade import Trade
 from model.src.main.strategy.mbl import MBL
 from model.src.main.strategy.mbl_snapshot import MBLSnapshot
 from model.src.main.strategy.mbl_update import MBLUpdate
@@ -16,7 +18,60 @@ from btfxwss import BtfxWss
 
 
 def main():
-    btfxwss()
+    #btfxwss()
+    home_made_websocket_trades()
+
+
+def home_made_websocket_trades():
+    ws = create_connection("wss://api.bitfinex.com/ws/2")
+
+    # Waiting connection
+    connected = False
+    while not connected:
+        result = ws.recv()
+        if result:
+            connected = True
+            result = json.loads(result)
+            print("Connection established to Bitfinex api version %s " % result['version'])
+        else:
+            print("Waiting connection...")
+
+    # Subscribe
+    ws.send(json.dumps({
+        "event": "subscribe",
+        "channel": "trades",
+        "symbol": "tBTCUSD",
+
+    }))
+    subscribed = False
+    while not subscribed:
+        result = ws.recv()
+        if result:
+            subscribed = True
+            result = json.loads(result)
+            print("Subscribed to %s channel for %s" % (result['channel'], result['pair']))
+        else:
+            print("Waiting response...")
+
+
+
+    snapshot = True
+    while True:
+        result = ws.recv()
+        result = json.loads(result)
+
+        if snapshot:
+            print("snapshot")
+            trades = Trades(result[1], length=3)
+            print(trades)
+            snapshot = False
+        elif result[1] == 'hb':
+            pass
+        elif result[1] == 'tu':
+            pass
+        elif result[1] == 'te':
+            trades.add_trade(Trade(result[2][1],result[2][2],result[2][3]))
+            print(trades)
 
 
 def home_made_websocket():
