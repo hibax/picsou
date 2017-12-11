@@ -1,15 +1,13 @@
-import json
 
 import logging
 import time
 import sys
 
-from websocket import create_connection
+import asyncio
 
 from engine.src.main.recorder.recorder import Recorder
+from feedhandler import start_feed
 from model.src.main.book.book import Book
-from model.src.main.trade.trades import Trades
-from model.src.main.trade.trade import Trade
 from model.src.main.strategy.mbl import MBL
 from model.src.main.strategy.mbl_snapshot import MBLSnapshot
 from model.src.main.strategy.mbl_update import MBLUpdate
@@ -18,115 +16,8 @@ from btfxwss import BtfxWss
 
 
 def main():
-    #btfxwss()
-    home_made_websocket_trades()
-
-
-def home_made_websocket_trades():
-    ws = create_connection("wss://api.bitfinex.com/ws/2")
-
-    # Waiting connection
-    connected = False
-    while not connected:
-        result = ws.recv()
-        if result:
-            connected = True
-            result = json.loads(result)
-            print("Connection established to Bitfinex api version %s " % result['version'])
-        else:
-            print("Waiting connection...")
-
-    # Subscribe
-    ws.send(json.dumps({
-        "event": "subscribe",
-        "channel": "trades",
-        "symbol": "tBTCUSD",
-
-    }))
-    subscribed = False
-    while not subscribed:
-        result = ws.recv()
-        if result:
-            subscribed = True
-            result = json.loads(result)
-            print("Subscribed to %s channel for %s" % (result['channel'], result['pair']))
-        else:
-            print("Waiting response...")
-
-
-
-    snapshot = True
-    while True:
-        result = ws.recv()
-        result = json.loads(result)
-
-        if snapshot:
-            print("snapshot")
-            trades = Trades(result[1], length=3)
-            print(trades)
-            snapshot = False
-        elif result[1] == 'hb':
-            pass
-        elif result[1] == 'tu':
-            pass
-        elif result[1] == 'te':
-            trades.add_trade(Trade(result[2][1],result[2][2],result[2][3]))
-            print(trades)
-
-
-def home_made_websocket():
-    ws = create_connection("wss://api.bitfinex.com/ws/2")
-
-    # Waiting connection
-    connected = False
-    while not connected:
-        result = ws.recv()
-        if result:
-            connected = True
-            result = json.loads(result)
-            print("Connection established to Bitfinex api version %s " % result['version'])
-        else:
-            print("Waiting connection...")
-
-    # Subscribe
-    ws.send(json.dumps({
-        "event": "subscribe",
-        "channel": "book",
-        "symbol": "tBTCUSD",
-        "prec": "P0",
-        "freq": "F0",
-        "len": "25"
-    }))
-    subscribed = False
-    while not subscribed:
-        result = ws.recv()
-        if result:
-            subscribed = True
-            result = json.loads(result)
-            print("Subscribed to %s channel for %s" % (result['channel'], result['pair']))
-        else:
-            print("Waiting response...")
-
-    mbl = MBL()
-    book = Book()
-
-
-    while True:
-        result = ws.recv()
-        result = json.loads(result)
-
-        if len(result[1]) > 3:
-            print("snapshot")
-            mbl_snapshot = MBLSnapshot(result[1])
-            book = mbl.from_snapshot(mbl_snapshot)
-            print(book)
-        elif result[1] == 'hb':
-            pass
-        elif len(result[1]) == 3:
-            print("update: " + str(result[1]))
-            update = MBLUpdate(result[1][0], result[1][1], result[1][2])
-            book = mbl.update(book, update)
-            print(book)
+    queue = asyncio.Queue()
+    start_feed(queue)
 
 
 def btfxwss():
