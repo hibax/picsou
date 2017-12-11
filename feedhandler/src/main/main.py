@@ -14,6 +14,8 @@ from model.src.main.strategy.mbl_update import MBLUpdate
 
 from btfxwss import BtfxWss
 
+import gdax
+
 
 def main():
     queue = asyncio.Queue()
@@ -76,6 +78,31 @@ def btfxwss():
 
     # Shutting down the client:
     wss.stop()
+
+
+
+def gdax_sandbox():
+
+
+    auth_client = gdax.AuthenticatedClient("5c8da7518000779d0f02161e447a54f5", "QQdn5e4Ch/BKJXwIl1EcKGSh2uOFYrg5HMy5RJV2cTbjd6XctxDc0PiJa3M+M7pTrMXS2045G9nwfL0NPtL1Vw==", "rravnxe2gea", api_url="https://api-public.sandbox.gdax.com")
+
+    print(auth_client.buy(price='0.10', size='0.01', product_id='BTC-USD'))
+    print(auth_client.sell(price='100000.00', size='0.01', product_id='BTC-USD'))
+
+    order_book = auth_client.get_product_order_book('BTC-USD', level=2)
+    print("asks: ", order_book["asks"])
+    print("bids: ", order_book["bids"])
+
+
+    my_orders = auth_client.get_orders()
+
+    for order in my_orders[0]:
+        if order['side'] == 'sell':
+            print("I'm trying to sell " + str(order['size']) + "BTC" + " at " + order['price'] + "$")
+        else:
+            print("I'm trying to buy " + str(order['size']) + "BTC" + " at " + order['price'] + "$")
+
+
 
 
 if __name__ == '__main__':
