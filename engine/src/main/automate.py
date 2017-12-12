@@ -1,13 +1,15 @@
+from engine.src.main.strategy.strategy import Strategy
 from engine.src.main.trading.trading_engine import TradingEngine
 
 
 def start_engine(in_queue, out_queue):
-    engine = TradingEngine(None)
+    strategy = Strategy()  # we should instantiate the desired strategy instead of the interface
+    engine = TradingEngine(strategy)
 
     while True:
         fct, msg = in_queue.get()
 
-        fct(engine, msg)
+        action = fct(engine, msg)
 
-        out_queue.put(msg)
+        out_queue.put((msg, action))
 
