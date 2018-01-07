@@ -1,11 +1,17 @@
+from executor.src.main.interface.executor import Executor
+
 
 def start_executor(out_queue):
+
+    executor = Executor()
 
     try:
         while True:
             msg, action = out_queue.get()
-            # executor code goes here
-            print(str(msg))
+
+            executor.execute(action)
+
+            # print(str(msg))
 
     except KeyboardInterrupt:
         print("Keyboard interruption in Executor")
