@@ -25,12 +25,20 @@ def test_queue_and_thread():
     # monitor([in_queue, out_queue])
 
     pool = Pool(processes=3)
+
     results = [pool.apply_async(start_engine, (in_queue, out_queue)),
                pool.apply_async(start_feed, (in_queue,)),
                pool.apply_async(start_executor, (out_queue,))]
 
-    for r in results:
-        r.get()
+    try:
+        for r in results:
+            r.get()
+
+    except KeyboardInterrupt:
+        print("Keybord interruption in main thread")
+
+    finally:
+        print("Cleaning main thread")
 
 
 def main():

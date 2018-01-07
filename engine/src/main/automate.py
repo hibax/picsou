@@ -6,10 +6,15 @@ def start_engine(in_queue, out_queue):
     strategy = Strategy()  # we should instantiate the desired strategy instead of the interface
     engine = TradingEngine(strategy)
 
-    while True:
-        fct, msg = in_queue.get()
+    try:
+        while True:
+            fct, msg = in_queue.get()
+            action = fct(engine, msg)
+            out_queue.put((msg, action))
 
-        action = fct(engine, msg)
+    except KeyboardInterrupt:
+        print("Keyboard interruption in trading engine")
 
-        out_queue.put((msg, action))
+    finally:
+        print("Cleaning trade engine")
 
