@@ -1,7 +1,7 @@
-from trader.src.main.interface.trader import Trader
+from executor.src.main.interface.executor import Executor
 
 
-class Recorder(Trader):
+class Recorder(Executor):
     def __init__(self, output_stream):
         self.output_stream = output_stream
 

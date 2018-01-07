@@ -1,4 +1,4 @@
-class Trader(object):
+class Executor(object):
     def add_order(self, order):
         pass
 

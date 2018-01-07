@@ -3,7 +3,7 @@ from multiprocessing.pool import Pool
 
 from feedhandler.src.main.feedhandler import start_feed
 from engine.src.main.automate import start_engine
-from trader.src.main.executor import start_executor
+from executor.src.main.executor_handler import start_executor
 from feedhandler.src.main.scheduled_task import create_repeated_timer
 
 
