@@ -2,6 +2,7 @@ import json
 
 from engine.src.main.interface.engine import Engine
 from engine.src.main.recorder.encoder import encode_book
+from engine.src.main.recorder.encoder import encode_trades
 
 
 class Recorder(Engine):
@@ -12,8 +13,8 @@ class Recorder(Engine):
     def on_mbl(self, book):
         self.output_stream.write(json.dumps(encode_book(book)))
 
-    def on_trade(self, trade):
-        pass
+    def on_trade(self, trades):
+        self.output_stream.write(json.dumps(encode_trades(trades)))
 
     def on_daily_info(self, info):
         pass

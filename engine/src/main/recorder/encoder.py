@@ -5,3 +5,7 @@ def encode_book(book):
 
 def encode_level(level):
     return [level.price, level.count, level.amount]
+
+
+def encode_trades(trades):
+    return []

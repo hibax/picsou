@@ -1,10 +1,18 @@
 import unittest
 
 from model.src.main.algo.min_heap import MinHeap
-
+import operator
 
 def extract_content(heap):
     return [heap.heappop() for i in range(len(heap))]
+
+class A(object):
+    def mth(self):
+        print('A')
+
+class B(A):
+    def mth(self):
+        print('B')
 
 
 class TestMinHeap(unittest.TestCase):
@@ -47,4 +55,11 @@ class TestMinHeap(unittest.TestCase):
         self.assertEqual(3, min_heap.heapreplace(5))
 
         self.assertEqual([4, 5, 6, 7, 8], extract_content(min_heap))
+
+    def test_call_child_method(self):
+        b = B()
+
+        m = operator.methodcaller('mth')
+
+        m(b)
 

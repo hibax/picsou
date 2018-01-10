@@ -1,3 +1,5 @@
+import operator
+
 from engine.src.main.strategy.strategy import Strategy
 from engine.src.main.trading.trading_engine import TradingEngine
 
@@ -8,8 +10,9 @@ def start_engine(in_queue, out_queue):
 
     try:
         while True:
-            fct, msg = in_queue.get()
-            action = fct(engine, msg)
+            fct_name, msg = in_queue.get()
+            fct = operator.methodcaller(fct_name, msg)
+            action = fct(engine)
             out_queue.put((msg, action))
 
     except KeyboardInterrupt:

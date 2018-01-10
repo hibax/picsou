@@ -2,8 +2,6 @@ import websockets
 import asyncio
 import json
 
-from engine.src.main.interface.engine import Engine
-from engine.src.main.trading.trading_engine import TradingEngine
 from model.src.main.book.book import Book
 from model.src.main.strategy.mbl import MBL
 from model.src.main.strategy.mbl_snapshot import MBLSnapshot
@@ -74,17 +72,17 @@ async def home_made_websocket(in_queue):
                     elif len(result[1]) > 3:
                         trades = Trades(result[1], length=3)
                         decoded_msg = trades
-                        fct_to_call = TradingEngine.on_trade
+                        fct_to_call = 'on_trade'
                     elif result[1] == 'te':
                         trades.add_trade(Trade(result[2][1], result[2][2], result[2][3]))
                         decoded_msg = trades
-                        fct_to_call = TradingEngine.on_trade
+                        fct_to_call = 'on_trade'
                 elif result[0] in channel_ids and channel_ids[result[0]] == 'b':
                     if len(result[1]) > 3:
                         mbl_snapshot = MBLSnapshot(result[1])
                         book = mbl.from_snapshot(mbl_snapshot)
                         decoded_msg = book
-                        fct_to_call = TradingEngine.on_mbl
+                        fct_to_call = 'on_mbl'
                     elif result[1] == 'hb':
                         pass
                     elif len(result[1]) == 3:
@@ -92,7 +90,7 @@ async def home_made_websocket(in_queue):
                         update = MBLUpdate(result[1][0], result[1][1], result[1][2])
                         book = mbl.update(book, update)
                         decoded_msg = book
-                        fct_to_call = TradingEngine.on_mbl
+                        fct_to_call = 'on_mbl'
 
                 if fct_to_call is not None:
                     in_queue.put((fct_to_call, decoded_msg))
