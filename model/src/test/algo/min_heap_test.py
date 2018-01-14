@@ -63,3 +63,7 @@ class TestMinHeap(unittest.TestCase):
 
         m(b)
 
+        ls = (l for l in open('max_heap_test.py', 'r'))
+        for l in ls:
+            print(l)
+

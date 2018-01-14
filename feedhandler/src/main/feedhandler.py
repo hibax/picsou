@@ -93,7 +93,7 @@ async def home_made_websocket(in_queue):
                         fct_to_call = 'on_mbl'
 
                 if fct_to_call is not None:
-                    in_queue.put((fct_to_call, decoded_msg))
+                    in_queue.put({'event_name': fct_to_call, 'data': decoded_msg})
 
         except KeyboardInterrupt:
             print("Keyboard interruption in websocket")

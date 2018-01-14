@@ -1,6 +1,6 @@
 
 def encode_book(book):
-    return [[encode_level(level) for level in book.bid], [encode_level(level) for level in book.ask]]
+    return {'bid': [encode_level(level) for level in book.bid], 'ask': [encode_level(level) for level in book.ask]}
 
 
 def encode_level(level):
@@ -8,4 +8,8 @@ def encode_level(level):
 
 
 def encode_trades(trades):
-    return []
+    return [encode_trade(t) for t in trades.trades]
+
+
+def encode_trade(trade):
+    return [trade.mts, trade.amount, trade.price]

@@ -18,6 +18,8 @@ class TradingEngine(Engine):
 
     def on_mbl(self, book):
         self.book = book
+        print('book.bid:' + str(book.bid))
+        print('book.ask:' + str(book.ask))
         action = self.strategy.produce_action(env=self.get_env())
         self.update_orders(action)
         return action

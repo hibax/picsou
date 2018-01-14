@@ -1,6 +1,8 @@
 import asyncio
 
-from model.src.main.book.book import Book
+import sys
+
+from evaluator.src.main.decoder import decode
 
 
 class Player(object):
@@ -9,7 +11,13 @@ class Player(object):
         self.current_pos = 0
 
     def events(self):
-        return (line for line in self.stream)
+        for line in open('../../../launcher/src/main/output.txt', 'r'):
+            try:
+                entry = decode(line)
+            except TypeError as err:
+                print("Unexpected error:", err)
+            print('replaying: ' + str(entry))
+            yield entry
 
 
 class Simulator(object):
@@ -23,8 +31,8 @@ class Simulator(object):
 
 class StrategyEvaluator(object):
 
-    def __init__(self):
-        self.player = Player([('on_mbl', Book()) for _ in range(5)])
+    def __init__(self, input_stream):
+        self.player = Player(input_stream)
         self.simulator = Simulator()
         self.in_queue = None
         self.out_queue = None
@@ -34,11 +42,14 @@ class StrategyEvaluator(object):
 
     async def replay_feed(self):
         try:
+            print('start replay')
             for event in self.player.events():
                 await self.replay_event(event)
                 await self.handle_output()
         except KeyboardInterrupt:
             print("Keyboard interruption in evaluator")
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
 
         finally:
             print("Cleaning evaluator")

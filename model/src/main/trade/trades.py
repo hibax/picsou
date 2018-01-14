@@ -7,6 +7,9 @@ class Trades(object):
         self.length = length
         self.trades = [Trade(trade[1], trade[2], trade[3]) for trade in trades[:length]] if trades else []
 
+    def __eq__(self, other):
+        return self.length == other.length and self.trades == other.trades
+
     def __str__(self):
         r = '\n'.join(str(trade) for trade in self.trades)
         header = "{0:^40}".format('TRADE')

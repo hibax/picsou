@@ -1,5 +1,6 @@
 import operator
 
+from engine.src.main.recorder.recorder import Recorder
 from engine.src.main.strategy.strategy import Strategy
 from engine.src.main.trading.trading_engine import TradingEngine
 
@@ -10,10 +11,26 @@ def start_engine(in_queue, out_queue):
 
     try:
         while True:
-            fct_name, msg = in_queue.get()
-            fct = operator.methodcaller(fct_name, msg)
+            event = in_queue.get()
+            fct = operator.methodcaller(event['event_name'], event['data'])
             action = fct(engine)
-            out_queue.put((msg, action))
+            out_queue.put((event['data'], action))
+
+    except KeyboardInterrupt:
+        print("Keyboard interruption in trading engine")
+
+    finally:
+        print("Cleaning trade engine")
+
+
+def start_recorder(in_queue):
+    engine = Recorder(open("output.txt", 'w'))
+
+    try:
+        while True:
+            event = in_queue.get()
+            fct = operator.methodcaller(event['event_name'], event['data'])
+            fct(engine)
 
     except KeyboardInterrupt:
         print("Keyboard interruption in trading engine")
