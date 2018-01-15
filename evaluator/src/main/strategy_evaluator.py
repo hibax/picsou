@@ -6,18 +6,14 @@ from evaluator.src.main.decoder import decode
 
 
 class Player(object):
-    def __init__(self, stream):
-        self.stream = stream
-        self.current_pos = 0
+    def __init__(self, filepath):
+        self.filepath = filepath
 
     def events(self):
-        for line in open('../../../launcher/src/main/output.txt', 'r'):
-            try:
+        with self.filepath.open() as stream:
+            for line in stream.readlines():
                 entry = decode(line)
-            except TypeError as err:
-                print("Unexpected error:", err)
-            print('replaying: ' + str(entry))
-            yield entry
+                yield entry
 
 
 class Simulator(object):
@@ -31,8 +27,8 @@ class Simulator(object):
 
 class StrategyEvaluator(object):
 
-    def __init__(self, input_stream):
-        self.player = Player(input_stream)
+    def __init__(self, record_path):
+        self.player = Player(record_path)
         self.simulator = Simulator()
         self.in_queue = None
         self.out_queue = None
