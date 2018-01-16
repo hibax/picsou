@@ -1,3 +1,4 @@
+import argparse
 from multiprocessing import Manager
 from multiprocessing.pool import Pool
 
@@ -17,6 +18,7 @@ def monitor(queues):
 
 
 def test_queue_and_thread():
+    strategy_name = parse_args()
     manager = Manager()
 
     in_queue = manager.Queue()
@@ -26,7 +28,7 @@ def test_queue_and_thread():
 
     pool = Pool(processes=3)
 
-    results = [pool.apply_async(start_engine, (in_queue, out_queue)),
+    results = [pool.apply_async(start_engine, (in_queue, out_queue, strategy_name)),
                pool.apply_async(start_feed, (in_queue,)),
                pool.apply_async(start_executor, (out_queue,))]
 
@@ -39,6 +41,18 @@ def test_queue_and_thread():
 
     finally:
         print("Cleaning main thread")
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--strategy", help="use this strategy")
+    args = parser.parse_args()
+
+    strategy = 'default'
+    if args.strategy:
+        strategy = args.strategy
+
+    return strategy
 
 
 def main():
