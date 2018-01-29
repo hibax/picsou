@@ -1,6 +1,5 @@
 from engine.src.main.strategy.strategy import Strategy
-from executor.src.main.interface.action import Action, Order
-from model.src.main.product.product import Product
+from executor.src.main.interface import actions
 
 
 class DumbStrategy(Strategy):
@@ -20,11 +19,12 @@ class DumbStrategy(Strategy):
         print("total bids : " + str(bids_amount))
         print("total asks : " + str(asks_amount))
 
-        if asks_amount < bids_amount:
-            order = Order.BUY
-        else:
-            order = Order.SELL
+        action = None
 
-        product = Product("BTC-USD", book)
+        if len(book.ask) > 0 and len(book.bid) > 0:
+            if asks_amount < bids_amount:
+                action = actions.buy("BTC-USD", 1, book.bid[0].price - 0.01)
+            else:
+                action = actions.sell("BTC-USD", 1, book.ask[0].price + 0.01)
 
-        return Action(order, product)
+        return action

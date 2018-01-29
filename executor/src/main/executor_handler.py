@@ -1,3 +1,6 @@
+import operator
+import sys
+
 from executor.src.main.interface.executor import Executor
 
 
@@ -7,14 +10,16 @@ def start_executor(out_queue):
 
     try:
         while True:
-            msg, action = out_queue.get()
+            action = out_queue.get()
 
-            executor.execute(action)
-
-            # print(str(msg))
+            # print('action: ' + str(action))
+            fct = operator.methodcaller(action['type'], action)
+            fct(executor)
 
     except KeyboardInterrupt:
         print("Keyboard interruption in Executor")
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
 
     finally:
         print("Cleaning Executor")

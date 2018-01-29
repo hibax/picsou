@@ -1,33 +1,12 @@
-from executor.src.main.interface.action import Order
 
 
 class Executor(object):
 
-    def execute(self, action):
+    def add_buy_order(self, action):
+        print("Buying " + action['product'] + " at " + str(action['order'].price) + "USD")
 
-        if action is None:
-            return
+    def add_sell_order(self, action):
+        print("Selling " + action['product'] + " at " + str(action['order'].price) + "USD")
 
-        bids = action.product.order_book.bid
-        asks = action.product.order_book.ask
-
-        if len(bids) < 1 or len(asks) < 1:
-            print("???")
-            return
-
-        if action.order == Order.BUY:
-            price = bids[0].price - 0.01
-            print("Buying " + action.product.product_id + " at " + str(price) + "USD")
-
-        elif action.order == Order.SELL:
-            price = asks[0].price + 0.01
-            print("Selling " + action.product.product_id + " at " + str(price) + "USD")
-
-        elif action.order == Order.CANCEL:
-            print("Cancelling orders for " + action.product.product_id)
-
-    def add_order(self, order):
-        pass
-
-    def cancel_order(self, cancellation):
-        pass
+    def cancel_order(self, action):
+        print("Cancelling " + action['order_id'] + ' on ' + action['product'])

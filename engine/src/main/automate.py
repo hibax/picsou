@@ -20,7 +20,8 @@ def start_engine(in_queue, out_queue, strategy_name):
             event = in_queue.get()
             fct = operator.methodcaller(event['event_name'], event['data'])
             action = fct(engine)
-            out_queue.put((event['data'], action))
+            if action is not None:
+                out_queue.put(action)
 
     except KeyboardInterrupt:
         print("Keyboard interruption in trading engine")
